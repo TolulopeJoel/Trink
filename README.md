@@ -1,0 +1,2 @@
+# Trink
+AI Budget Manager
