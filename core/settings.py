@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # local apps
-    "transactions.apps.TransactionsConfig",
+    "apps.transaction.apps.TransactionConfig",
 ]
 
 MIDDLEWARE = [
