@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # local apps
     "apps.transaction.apps.TransactionConfig",
+    "apps.category.apps.CategoryConfig",
 ]
 
 MIDDLEWARE = [
