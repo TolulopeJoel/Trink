@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import BankTransaction, StoreItem, StoreTransaction
+
+admin.site.register(BankTransaction)
+admin.site.register(StoreTransaction)
+admin.site.register(StoreItem)
