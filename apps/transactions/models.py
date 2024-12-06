@@ -3,7 +3,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from apps.category.models import SubCategory
+from apps.categories.models import SubCategory
 from utils.models import TimestampedModel
 
 

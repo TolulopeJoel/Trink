@@ -3,7 +3,7 @@ import csv
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from apps.category.models import Category, SubCategory
+from apps.categories.models import Category, SubCategory
 
 
 class Command(BaseCommand):
