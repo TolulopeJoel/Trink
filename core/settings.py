@@ -10,11 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -24,8 +28,12 @@ SECRET_KEY = "django-insecure-^-nd5yph77t(8u)eumvu@jxe=euhjloc^==8xyow(3dkycm)ov
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+APPLICATION_NAME="Trink"
 
 ALLOWED_HOSTS = []
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -38,14 +46,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # 3rd party libraries
+    "corsheaders",
+    "rest_framework",
+    "rest_framework.authtoken",
+
     # local apps
-    "apps.transaction.apps.TransactionConfig",
-    "apps.category.apps.CategoryConfig",
+    "apps.accounts.apps.AccountsConfig",
+    "apps.categories.apps.CategoriesConfig",
+    "apps.transactions.apps.TransactionsConfig",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -125,3 +140,15 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# Gemini settings
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL')
+
+# Plaid Configurations
+PLAID_SECRET = os.getenv('PLAID_SECRET')
+PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS')
+PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
+PLAID_REDIRECT_URI="http://localhost:8000/tada"
+SUPPORTED_COUNTRIES = os.getenv('PLAID_COUNTRY_CODES')
