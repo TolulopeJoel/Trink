@@ -11,15 +11,13 @@ class GetLinkTokenView(APIView):
         """
         Generate a Plaid Link token for the authenticated user.
         """
-        token = PlaidService.create_link_token(str(request.user.id))
+        if token := PlaidService.create_link_token(str(request.user.id)):
+            return Response(token)
 
-        if not token:
-            return Response(
-                {'error': 'Failed to generate link token'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-        return Response(token)
+        return Response(
+            {'error': 'Failed to generate link token'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 class ExchangePublicTokenView(APIView):
