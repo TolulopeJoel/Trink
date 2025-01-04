@@ -20,7 +20,7 @@ class AbstractTransaction(TimestampedModel):
         related_name='%(class)s_transactions'
     )
 
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     transaction_date = models.DateTimeField()
     type = models.CharField(max_length=7, choices=TYPE_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
