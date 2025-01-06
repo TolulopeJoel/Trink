@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 import google.generativeai as genai
 import PIL.Image
@@ -17,21 +18,17 @@ def get_receipt_data(image_path=None):
 
     prompt = f"""
     Return the transaction details in the receipt in JSON format.
-
     Use this JSON schema: 
     Transaction = {{
-        "store_name": "str"
-        "date_time": "str (ISO 8601 standard)",
-        "total_amount": "str",
-        "items": [{{
-            "name": "str",
-            "quantity": "str",
-            "unit_price": "str",
-            "total_price": "str",
-            "category": "str (select a single category from the list: {subcatgories_string})"
+        store_name: str,
+        date_time: str (ISO 8601 standard),
+        items: [{{
+            category: str (select one from here: {subcatgories_string}),
+            name: str,
+            quantity: int,
+            unit_price: float
         }}]
     }}
-
     Return: dict[Transaction]
     """
 
@@ -39,5 +36,12 @@ def get_receipt_data(image_path=None):
     json_string = response.text
 
     cleaned_string = json_string.replace("```json\n", "").replace("\n```", "")
+    transaction_data = json.loads(cleaned_string)
 
-    return json.loads(cleaned_string)
+    if items := transaction_data.get('items', []):
+        transaction_data['total_amount'] = sum(
+            item['quantity'] * item['unit_price']
+            for item in items
+        )
+
+    return transaction_data
