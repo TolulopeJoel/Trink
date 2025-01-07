@@ -4,7 +4,6 @@ from typing import Dict, List, Optional
 
 from apps.accounts.models import Profile
 from apps.transactions.models import BankTransaction
-from utils.categories import sanitise_subcategory
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +19,22 @@ class AccountProcessor:
         profile.account_balance = total_balance
         profile.save(update_fields=['account_balance'])
         return total_balance
+    
+    @staticmethod
+    def _sanitise_subcategory(category):
+        """
+        Formats Plaid transaction subcategory into readable text.
+        """
+        multiwords = {
+            'BANK_FEES', 'FOOD_AND_DRINK', 'GENERAL_MERCHANDISE', 'GENERAL_SERVICES', 'GOVERNMENT_AND_NON_PROFIT',
+            'HOME_IMPROVEMENT', 'LOAN_PAYMENTS', 'PERSONAL_CARE', 'RENT_AND_UTILITIES', 'TRANSFER_IN', 'TRANSFER_OUT'
+        }
+
+        for word in multiwords:
+            if category.startswith(word):
+                return " ".join(category.replace(f'{word}_', '').split('_')).lower()
+        return " ".join(category.split('_')[1:]).lower()
+
 
     @staticmethod
     def process_transaction(transaction: Dict, user, subcategories: Dict) -> Optional[BankTransaction]:
@@ -51,7 +66,7 @@ class AccountProcessor:
 
             # Add subcategory to transaction
             if 'personal_finance_category' in transaction:
-                category_name = sanitise_subcategory(
+                category_name = AccountProcessor._sanitise_subcategory(
                     transaction['personal_finance_category']['detailed']
                 )
                 # Use the prefetched subcategories for perfromance
@@ -68,3 +83,5 @@ class AccountProcessor:
             logger.error(f"Error processing transaction: {str(e)}")
 
         return None
+
+

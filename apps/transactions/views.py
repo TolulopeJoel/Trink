@@ -3,7 +3,7 @@ import logging
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView, Response, status
 
-from services.ocr import get_receipt_data
+from .services.ocr import get_receipt_data
 
 logger = logging.getLogger(__name__)
 

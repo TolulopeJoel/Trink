@@ -1,5 +1,4 @@
 import json
-from decimal import Decimal
 
 import google.generativeai as genai
 import PIL.Image

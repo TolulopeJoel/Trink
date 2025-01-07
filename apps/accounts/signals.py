@@ -7,10 +7,10 @@ from django.dispatch import receiver
 
 from apps.categories.models import SubCategory
 from apps.transactions.models import BankTransaction
-from services.account_processor import AccountProcessor
 from services.plaid import PlaidService
 
 from .models import Profile
+from .services import AccountProcessor
 
 logger = logging.getLogger(__name__)
 
