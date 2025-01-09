@@ -116,28 +116,27 @@ class PlaidService:
         has_more = True
 
         try:
-            # Iterate through each page of new transaction updates for item
+            # Iterate through each page of new transaction updates
             while has_more:
                 request = TransactionsSyncRequest(
                     access_token=access_token,
                     cursor=cursor,
                 )
-
                 response = cls.client.transactions_sync(request).to_dict()
                 cursor = response['next_cursor']
 
-                # If no transactions are available yet, wait and poll the endpoint.
+                # If no transactions are available yet, wait and poll the endpoint
                 if cursor == '':
                     logger.debug("No transactions available yet, polling...")
                     time.sleep(2)
                     continue
 
-                # If cursor is not an empty string, we got results
                 added.extend(response['added'])
                 has_more = response['has_more']
 
                 logger.info(f"Retrieved {len(added)} new transactions. Has more: {has_more}")
 
+                # Save the cursor for future requests
                 profile.next_cursor = cursor
                 profile.save()
 

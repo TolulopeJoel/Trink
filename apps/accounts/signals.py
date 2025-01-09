@@ -36,25 +36,25 @@ def get_account_details(sender, instance: Profile, created: bool, **kwargs):
                 AccountProcessor.update_balance(instance, accounts)
                 logger.info(f"Updated balance for profile {instance.id}")
 
-        # Process transactions
-        with transaction.atomic():
-            if past_transactions := PlaidService.get_transactions(profile=instance):
-                # Prefetch subcategories to avoid N+1 queries
-                subcategories = {
-                    sc.name: sc for sc in SubCategory.objects.all()
-                }
+        # Update transactions on profile creation
+        if not instance.next_cursor:
+            with transaction.atomic():
+                if past_transactions := PlaidService.get_transactions(profile=instance):
+                    # Prefetch subcategories to avoid N+1 queries
+                    subcategories = {
+                        sc.name: sc for sc in SubCategory.objects.all()
+                    }
 
-                # Process transactions in bulk
-                bank_transactions = []
-                for trans in past_transactions:
-                    if bank_trans := AccountProcessor.process_transaction(trans, instance.user, subcategories):
-                        bank_transactions.append(bank_trans)
+                    # Process transactions in bulk
+                    bank_transactions = []
+                    for trans in past_transactions:
+                        if bank_trans := AccountProcessor.process_transaction(trans, instance.user, subcategories):
+                            bank_transactions.append(bank_trans)
 
-                if bank_transactions:
-                    # Bulk create the transactions
-                    BankTransaction.objects.bulk_create(bank_transactions)
-                    logger.info(
-                        f"Created {len(bank_transactions)} transactions for profile {instance.id}")
+                    if bank_transactions:
+                        # Bulk create the transactions
+                        BankTransaction.objects.bulk_create(bank_transactions)
+                        logger.info(f"Created {len(bank_transactions)} transactions for profile {instance.id}")
 
     except Exception as e:
         logger.error(f"Error in get_account_details for profile {instance.id}: {str(e)}")
