@@ -6,6 +6,7 @@ from .models import BankTransaction, StoreItem, StoreTransaction
 @admin.register(BankTransaction)
 class BankTransactionAdmin(admin.ModelAdmin):
     search_fields = ('description',)
+    list_filter = ('bank_account',)
     readonly_fields = ('transaction_date',)
     list_display = ('user', 'amount', 'description', 'transaction_date')
 

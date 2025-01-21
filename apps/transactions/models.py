@@ -3,6 +3,7 @@ import uuid
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from apps.accounts.models import BankAccount
 from apps.categories.models import SubCategory
 from utils.models import TimestampedModel
 
@@ -34,6 +35,7 @@ class AbstractTransaction(TimestampedModel):
 
 
 class BankTransaction(AbstractTransaction):
+    bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE)
     subcategories = models.ManyToManyField(SubCategory)
     balance = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 

@@ -1,8 +1,8 @@
 import logging
 from decimal import Decimal
-from typing import Dict, List, Optional
+from typing import Optional
 
-from apps.accounts.models import Profile
+from apps.accounts.models import BankAccount
 from apps.transactions.models import BankTransaction
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class AccountProcessor:
 
 
     @staticmethod
-    def process_transaction(transaction: Dict, user, subcategories: Dict) -> Optional[BankTransaction]:
+    def process_transaction(transaction: dict, user, subcategories: dict) -> Optional[BankTransaction]:
         """Process a single transaction and return BankTransaction object."""
         # Get the transaction date by order of precedence
         date_fields = [
@@ -45,9 +45,10 @@ class AccountProcessor:
 
         # Create BankTransaction object
         try:
+            bank_account = BankAccount.objects.get(account_id=transaction.get('account_id'))
             bank_transaction = BankTransaction(
-                description=transaction.get(
-                    'merchant_name', 'Unknown Merchant'),
+                bank_account=bank_account,
+                description=transaction.get('merchant_name', 'Unknown Merchant'),
                 transaction_date=transaction_date,
                 amount=Decimal(str(transaction['amount'])),
                 user=user
@@ -58,7 +59,7 @@ class AccountProcessor:
                 category_name = AccountProcessor._sanitise_subcategory(
                     transaction['personal_finance_category']['detailed']
                 )
-                # Use the prefetched subcategories for perfromance
+                # Use the prefetched subcategories for performance
                 if subcategory := subcategories.get(category_name):
                     bank_transaction.subcategories.add(subcategory)
                 else:
@@ -72,5 +73,4 @@ class AccountProcessor:
             logger.error(f"Error processing transaction: {str(e)}")
 
         return None
-
 
