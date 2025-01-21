@@ -44,6 +44,6 @@ class ExchangePublicTokenView(APIView):
             )
 
         profile = self.request.user.profile
-        profile.plaid_access_token = access_token
+        profile.plaid_token = access_token
         profile.save()
         return Response({'message': '"Successfully exchanged Plaid public token'})

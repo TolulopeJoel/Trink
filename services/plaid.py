@@ -109,7 +109,7 @@ class PlaidService:
         Retrieve transactions for a user profile.
         """
         cursor = profile.next_cursor
-        access_token = profile.plaid_access_token
+        access_token = profile.plaid_token
 
         logger.info(f"Starting transaction sync for profile ID: {profile.id}")
         added = []  # New transaction updates since "cursor"

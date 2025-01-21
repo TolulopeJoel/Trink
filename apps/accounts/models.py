@@ -4,9 +4,9 @@ from django.db import models
 
 class Profile(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
-    plaid_access_token = models.CharField(max_length=255, blank=True, null=True)
-    account_balance = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
+    monthly_income = models.DecimalField(max_digits=10, decimal_places=2,  default=0.00)
 
+    plaid_token = models.CharField(max_length=255, blank=True, null=True)
     next_cursor = models.TextField(null=True, blank=True)
 
     @property
