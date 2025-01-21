@@ -9,5 +9,24 @@ class Profile(models.Model):
 
     next_cursor = models.TextField(null=True, blank=True)
 
+    @property
+    def account_balance(self):
+        return sum(account.balance for account in self.user.bankaccount_set.all())
+
     def __str__(self):
         return self.user.username
+
+
+class BankAccount(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    account_id = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
+
+    balance = models.DecimalField(
+        decimal_places=2,
+        default=0.00,
+        max_digits=10
+    )
+
+    def __str__(self):
+        return f"{self.user} - {self.name} ({self.balance})"

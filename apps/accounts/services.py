@@ -10,17 +10,6 @@ logger = logging.getLogger(__name__)
 
 class AccountProcessor:
     @staticmethod
-    def update_balance(profile: Profile, accounts: List[Dict]) -> Decimal:
-        """Update account balance from Plaid accounts data."""
-        total_balance = sum(
-            Decimal(str(account['balances']['available'] or 0))
-            for account in accounts
-        )
-        profile.account_balance = total_balance
-        profile.save(update_fields=['account_balance'])
-        return total_balance
-    
-    @staticmethod
     def _sanitise_subcategory(category):
         """
         Formats Plaid transaction subcategory into readable text.
