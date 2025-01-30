@@ -24,7 +24,6 @@ class AccountProcessor:
                 return " ".join(category.replace(f'{word}_', '').split('_')).lower()
         return " ".join(category.split('_')[1:]).lower()
 
-
     @staticmethod
     def process_transaction(transaction: dict, user, subcategories: dict) -> Optional[BankTransaction]:
         """Process a single transaction and return BankTransaction object."""
@@ -48,7 +47,7 @@ class AccountProcessor:
             bank_account = BankAccount.objects.get(account_id=transaction.get('account_id'))
             bank_transaction = BankTransaction(
                 bank_account=bank_account,
-                description=transaction.get('merchant_name', 'Unknown Merchant'),
+                merchant=transaction.get('merchant_name', 'Unknown Merchant'),
                 transaction_date=transaction_date,
                 amount=Decimal(str(transaction['amount'])),
                 user=user
@@ -73,4 +72,3 @@ class AccountProcessor:
             logger.error(f"Error processing transaction: {str(e)}")
 
         return None
-

@@ -20,7 +20,7 @@ class AbstractTransaction(TimestampedModel):
         on_delete=models.CASCADE,
         related_name='%(class)s_transactions'
     )
-
+    merchant = models.CharField(max_length=200, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     transaction_date = models.DateTimeField()
     type = models.CharField(max_length=7, choices=TYPE_CHOICES)
@@ -31,6 +31,7 @@ class AbstractTransaction(TimestampedModel):
         indexes = [
             models.Index(fields=['transaction_date']),
             models.Index(fields=['type']),
+            models.Index(fields=['merchant']),
         ]
 
 
@@ -46,9 +47,7 @@ class StoreTransaction(AbstractTransaction):
 
     @property
     def total_amount(self):
-        if self.pk:
-            return sum(item.total_amount for item in self.items.all())
-        return self.amount or 0
+        return sum(item.total_amount for item in self.items.all()) if self.pk else 0
 
     def save(self, *args, **kwargs):
         self.amount = self.total_amount or self.amount
