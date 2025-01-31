@@ -10,6 +10,7 @@ class Profile(models.Model):
         ('GBP', 'British Pound'),
         ('JPY', 'Japanese Yen'),
         ('CAD', 'Canadian Dollar'),
+        ('NGN', 'Nigerian Naira'),
     ]
 
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
