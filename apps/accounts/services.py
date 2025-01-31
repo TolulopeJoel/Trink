@@ -49,7 +49,12 @@ class AccountProcessor:
                 bank_account=bank_account,
                 merchant=transaction.get('merchant_name', 'Unknown Merchant'),
                 transaction_date=transaction_date,
-                amount=Decimal(str(transaction['amount'])),
+                # Using `abs` to unify transaction amounts into positive values. Why?
+                # - Banks are chaotic: some report expenses as "-100", others as "100".
+                # - This app only tracks expenses, so we treat all as positive.
+                # - Why not negative? Life is good (and math is simpler this way).
+                # WARNING: If income tracking is added later, revisit this logic!
+                amount=abs(Decimal(str(transaction['amount']))),
                 user=user
             )
 
