@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from model_utils import FieldTracker
 
 
 class Profile(models.Model):
@@ -26,6 +27,7 @@ class Profile(models.Model):
         max_length=255, blank=True, null=True,
         help_text="Access token for latest linked bank accounts"
     )
+    tracker = FieldTracker()
 
     @property
     def account_balance(self):
