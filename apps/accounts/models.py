@@ -22,8 +22,10 @@ class Profile(models.Model):
         help_text="User's preferred currency"
     )
 
-    plaid_token = models.CharField(max_length=255, blank=True, null=True)
-    next_cursor = models.TextField(null=True, blank=True)
+    last_plaid_token = models.CharField(
+        max_length=255, blank=True, null=True,
+        help_text="Access token for latest linked bank accounts"
+    )
 
     @property
     def account_balance(self):
@@ -35,13 +37,18 @@ class Profile(models.Model):
 
 class BankAccount(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    account_id = models.CharField(max_length=200)
-    name = models.CharField(max_length=200)
 
+    name = models.CharField(max_length=200)
+    account_id = models.CharField(max_length=200)
+    access_token = models.CharField(max_length=255, blank=True, null=True)
     balance = models.DecimalField(
         decimal_places=2,
         default=0.00,
         max_digits=10
+    )
+    next_cursor = models.TextField(
+        null=True, blank=True,
+        help_text="Cursor for fetching transactions"
     )
 
     def __str__(self):
