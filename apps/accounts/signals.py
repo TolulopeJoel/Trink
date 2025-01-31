@@ -22,50 +22,81 @@ def create_profile(sender, instance, created, *args, **kwargs):
 
 
 @receiver(post_save, sender=Profile)
-def update_transaction(sender, instance: Profile, created: bool, **kwargs):
-    """
-    Get transactions when a Profile is created.
-    """
-    if not instance.plaid_token:
+def create_bank_accounts(sender, instance: Profile, created, *args, **kwargs):
+    if not (
+        (access_token := instance.last_plaid_token)
+        and instance.tracker.has_changed("last_plaid_token")
+    ):
         return
 
-    try:
-        # Update transactions on profile creation
-        if not instance.next_cursor:
-            with transaction.atomic():
-                if past_transactions := PlaidService.get_transactions(profile=instance):
-                    # Prefetch subcategories to avoid N+1 queries
-                    subcategories = {
-                        sc.name: sc for sc in SubCategory.objects.all()
-                    }
+    accounts = PlaidService.get_accounts(access_token)
+    if not accounts:
+        return
 
-                    # Process transactions in bulk
+    with transaction.atomic():
+        # Get existing accounts in a single query
+        existing_accounts = {
+            acc.account_id: acc
+            for acc in BankAccount.objects.filter(
+                user=instance.user,
+                account_id__in=[acc["account_id"] for acc in accounts]
+            )
+        }
+
+        to_create, to_update = [], []
+
+        for account in accounts:
+            account_id = account["account_id"]
+
+            if account_id in existing_accounts:
+                # Update existing account
+                bank_account = existing_accounts[account_id]
+                bank_account.name = account["official_name"]
+                bank_account.balance = account["balances"]["current"]
+                to_update.append(bank_account)
+            else:
+                # Create new account
+                to_create.append(
+                    BankAccount(
+                        user=instance.user,
+                        account_id=account_id,
+                        name=account["official_name"],
+                        balance=account["balances"]["current"],
+                        access_token=access_token
+                    )
+                )
+
+        # Perform bulk operations
+        if to_create:
+            BankAccount.objects.bulk_create(to_create)
+        if to_update:
+            BankAccount.objects.bulk_update(to_update, ['name', 'balance'])
+
+        # Process transactions for new accounts
+        new_accounts = BankAccount.objects.filter(
+            user=instance.user,
+            account_id__in=[acc.account_id for acc in to_create],
+            next_cursor__isnull=True
+        )
+
+        # Prefetch subcategories once
+        subcategories = {
+            sc.name: sc for sc in SubCategory.objects.all()
+        }
+
+        for bank_account in new_accounts:
+            try:
+                if past_transactions := PlaidService.get_transactions(bank_account):
                     bank_transactions = []
                     for trans in past_transactions:
-                        if bank_trans := AccountProcessor.process_transaction(trans, instance.user, subcategories):
+                        if bank_trans := AccountProcessor.process_transaction(
+                            trans, bank_account.user, subcategories
+                        ):
                             bank_transactions.append(bank_trans)
 
                     if bank_transactions:
-                        # Bulk create the transactions
                         BankTransaction.objects.bulk_create(bank_transactions)
-                        logger.info(
-                            f"Created {len(bank_transactions)} transactions for profile {instance.id}")
-
-    except Exception as e:
-        logger.error(
-            f"Error in get_account_details for profile {instance.id}: {str(e)}")
-
-
-@receiver(post_save, sender=Profile)
-def create_bank_accounts(sender, instance: Profile, created, *args, **kwargs):
-    if instance.plaid_token and not BankAccount.objects.filter(user=instance.user).exists():
-        if accounts := PlaidService.get_accounts(instance.plaid_token):
-            for account in accounts:
-                BankAccount.objects.create(
-                    user=instance.user,
-                    account_id=account["account_id"],
-                    name=account["name"],
-                    balance=account["balances"]["current"],
+            except Exception as e:
+                logger.error(
+                    f"Error processing transactions for BankAccount {bank_account.id}: {str(e)}"
                 )
-
-                logger.info(f"Created account for profile {instance.id}")
