@@ -11,7 +11,7 @@ class GetLinkTokenView(APIView):
         """
         Generate a Plaid Link token for the authenticated user.
         """
-        if token := PlaidService.create_link_token(str(request.user.id)):
+        if token := PlaidService.create_link_token(request.user):
             return Response(token)
 
         return Response(
@@ -44,6 +44,6 @@ class ExchangePublicTokenView(APIView):
             )
 
         profile = self.request.user.profile
-        profile.plaid_token = access_token
+        profile.last_plaid_token = access_token
         profile.save()
         return Response({'message': '"Successfully exchanged Plaid public token'})
