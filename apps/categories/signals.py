@@ -10,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_migrate)
 def run_on_migrate(sender, **kwargs):
-    if sender.name == "apps.categories":
-        if not SubCategory.objects.exists():
-            logger.info("SubCategory table is empty. Importing categories from seed file.")
-            call_command("import_categories", "./seed_file.csv")
+    if sender.name == "apps.categories" and not SubCategory.objects.exists():
+        logger.info("SubCategory table is empty. Importing categories from seed file.")
+        call_command("import_categories", "./seed_file.csv")
