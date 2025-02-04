@@ -26,12 +26,19 @@ class AbstractTransaction(
     transaction_date = models.DateTimeField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
+    @property
+    def type(self):
+        if hasattr(self, 'store_location'):
+            return 'EXPENSE'
+        return 'EXPENSE' if self.subcategories.select_related('category').first().category.is_expense else 'INCOME'
+
     class Meta:
         abstract = True
         indexes = [
             models.Index(fields=['transaction_date']),
             models.Index(fields=['merchant']),
         ]
+
 
 class ManualTransaction(AbstractTransaction):
     subcategories = models.ManyToManyField(SubCategory)

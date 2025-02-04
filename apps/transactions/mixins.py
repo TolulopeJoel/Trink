@@ -35,8 +35,8 @@ class TransactionEmbeddingMixin:
     def embedding_text(self) -> str:
         components = self.get_embedding_components()
 
-        if hasattr(self, 'store_name'):
-            components.append(f"Retail Location: {self.store_name}")
+        if hasattr(self, 'store_location'):
+            components.append(f"Retail Location: {self.store_location}")
 
         # Add itemized breakdown for store transactions
         if hasattr(self, 'items'):
@@ -52,14 +52,14 @@ class TransactionEmbeddingMixin:
 
     def get_embedding_components(self) -> list[str]:
         components = [
-            f"Transaction Type: {'EXPENSE' if self.items.first().category.is_expense else 'INCOME'}",
+            f"Transaction Type: {self.type}",
             f"Date/Time: {self.format_transaction_datetime()}",
             f"Time Context: {self.get_time_of_day()} | {self.get_day_type()}",
             f"Merchant: {self.merchant or 'Unknown Merchant'}",
             f"Amount: {self.get_currency()} {abs(self.amount):.2f}",
         ]
 
-        if not hasattr(self, 'store_name'):
+        if not hasattr(self, 'store_location'):
             components.append(f"Category: {self._format_categories(self)}")
 
         return components

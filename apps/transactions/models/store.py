@@ -9,7 +9,7 @@ from .base import AbstractTransaction
 
 class StoreTransaction(AbstractTransaction):
     """Model for retail store transactions"""
-    store_name = models.CharField(max_length=200, null=True, blank=True)
+    store_location = models.CharField(max_length=200, null=True, blank=True)
 
     @property
     def total_amount(self) -> Decimal:
