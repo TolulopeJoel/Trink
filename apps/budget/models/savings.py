@@ -9,7 +9,6 @@ from utils.models import TimestampedModel
 
 class SavingsGoal(TimestampedModel):
     """Track savings goals and progress"""
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
