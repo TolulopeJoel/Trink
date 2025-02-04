@@ -32,23 +32,27 @@ class PlaidService:
     client = plaid_api.PlaidApi(_api_client)
 
     @classmethod
-    def create_link_token(cls, user_id: str, products: Optional[List[str]] = None) -> Dict[str, Any]:
+    def create_link_token(cls, user) -> Dict[str, Any]:
         """
-        Create a Plaid link token for a specific user.
+        Create a Plaid link token for a user.
         """
+        user_id = str(user.id)
         logger.info(f"Creating Plaid link token for user_id: {user_id}")
-        try:
-            request = LinkTokenCreateRequest(
-                language='en',
-                client_name=settings.APPLICATION_NAME,
-                products=[Products(p) for p in (
-                    products or ['auth', 'transactions'])],
-                country_codes=[CountryCode('US')],
-                redirect_uri=settings.PLAID_REDIRECT_URI,
-                user=LinkTokenCreateRequestUser(client_user_id=user_id)
-            )
 
+        try:
+            request_params = {
+                "language": "en",
+                "country_codes": [CountryCode('US')],
+                "client_name": settings.APPLICATION_NAME,
+                "redirect_uri": settings.PLAID_REDIRECT_URI,
+                "products": [Products("auth"), Products("transactions")],
+                "user": LinkTokenCreateRequestUser(client_user_id=user_id),
+            }
+
+            # Generate a new link token for adding a new institution
+            request = LinkTokenCreateRequest(**request_params)
             response = cls.client.link_token_create(request)
+
             logger.info(f"Successfully created link token for user_id: {user_id}")
             return response.to_dict()
 
@@ -104,14 +108,14 @@ class PlaidService:
             return {}
 
     @classmethod
-    def get_transactions(cls, profile) -> List[Dict[str, Any]]:
+    def get_transactions(cls, bank_account) -> List[Dict[str, Any]]:
         """
         Retrieve transactions for a user profile.
         """
-        cursor = profile.next_cursor or ''
-        access_token = profile.plaid_token
+        cursor = bank_account.next_cursor or ''
+        access_token = bank_account.access_token
 
-        logger.info(f"Starting transaction sync for profile ID: {profile.id}")
+        logger.info(f"Starting transaction sync for BankAccount ID: {bank_account.id}")
         added = []  # New transaction updates since "cursor"
         has_more = True
 
@@ -137,15 +141,15 @@ class PlaidService:
                 logger.info(f"Retrieved {len(added)} new transactions. Has more: {has_more}")
 
                 # Save the cursor for future requests
-                profile.next_cursor = cursor
-                profile.save()
+                bank_account.next_cursor = cursor
+                bank_account.save()
 
             logger.info(f"Completed transaction sync. Total transactions retrieved: {len(added)}")
             return added
 
         except plaid.ApiException as e:
             logger.error(
-                f"Failed to export transactions for profile ID: {profile.id}. "
+                f"Failed to export transactions for BankAccount ID: {bank_account.id}. "
                 f"Error code: {e.status}, message: {e.body}",
                 exc_info=True
             )

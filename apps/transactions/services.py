@@ -19,7 +19,7 @@ def get_receipt_data(image_path=None):
     Return the transaction details in the receipt in JSON format.
     Use this JSON schema: 
     Transaction = {{
-        store_name: str,
+        store_location: str,
         date_time: str (ISO 8601 standard),
         items: [{{
             category: str (select one from here: {subcatgories_string}),

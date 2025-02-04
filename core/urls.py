@@ -23,6 +23,7 @@ urlpatterns = [
 
 v1_urls = [
     path('accounts/', include('apps.accounts.urls')),
+    path('budgets/', include('apps.budget.urls')),
     path('transactions/', include('apps.transactions.urls')),
 ]
 
