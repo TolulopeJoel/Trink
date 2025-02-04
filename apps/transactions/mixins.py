@@ -29,8 +29,6 @@ class TransactionEmbeddingMixin:
     Budget Impact:
     - Food Delivery: 9000/10000 (90% utilized)
     - Entertainment: 1500/2000
-
-    Time Analysis: Peak Spending Hour | Digital Transaction
     """
 
     @property
@@ -45,7 +43,7 @@ class TransactionEmbeddingMixin:
             components.append("\nItem Details:")
             components.extend(self._format_items())
             components.append(f"Total Items: {self.items.count()}")
-        
+
         # Add user notes if available
         if self.description:
             components.append(f"\nUser Notes: {self.description}")
@@ -54,7 +52,7 @@ class TransactionEmbeddingMixin:
 
     def get_embedding_components(self) -> list[str]:
         components = [
-            f"Transaction Type: {self.type.upper()}",
+            f"Transaction Type: {'EXPENSE' if self.items.first().category.is_expense else 'INCOME'}",
             f"Date/Time: {self.format_transaction_datetime()}",
             f"Time Context: {self.get_time_of_day()} | {self.get_day_type()}",
             f"Merchant: {self.merchant or 'Unknown Merchant'}",

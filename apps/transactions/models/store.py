@@ -4,17 +4,11 @@ from django.db import models
 
 from apps.categories.models import SubCategory
 
-from ..constants import TransactionType
 from .base import AbstractTransaction
 
 
 class StoreTransaction(AbstractTransaction):
     """Model for retail store transactions"""
-    type = models.CharField(
-        max_length=6,
-        default=TransactionType.EXPENSE,
-        editable=False
-    )
     store_name = models.CharField(max_length=200, null=True, blank=True)
 
     @property
