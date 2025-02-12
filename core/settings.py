@@ -156,9 +156,15 @@ VECTOR_DB_NAME = os.getenv("VECTOR_DB_NAME")
 VECTOR_COLLECTION_NAME = os.getenv("VECTOR_COLLECTION_NAME")
 
 # AI Configuration
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
+
 LANGSMITH_TRACING = os.getenv("LANGSMITH_TRACING", "false").lower() == "true"
 LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
+
 LLM_MODEL = os.getenv("LLM_MODEL")
 LLM_API_KEY = os.getenv("LLM_API_KEY")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 LLM_API_BASE = os.getenv("LLM_API_BASE")
+
+# Gemini settings
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL')
