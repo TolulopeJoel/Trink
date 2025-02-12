@@ -143,14 +143,22 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
-# Gemini settings
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-GEMINI_MODEL = os.getenv('GEMINI_MODEL')
-
 # Plaid Configurations
 PLAID_SECRET = os.getenv('PLAID_SECRET')
 PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS')
 PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
 PLAID_REDIRECT_URI="http://localhost:8000/tada"
 SUPPORTED_COUNTRIES = os.getenv('PLAID_COUNTRY_CODES')
+
+# MongoDB Settings
+MONGO_URI = os.getenv("MONGO_URI")
+VECTOR_DB_NAME = os.getenv("VECTOR_DB_NAME")
+VECTOR_COLLECTION_NAME = os.getenv("VECTOR_COLLECTION_NAME")
+
+# AI Configuration
+LANGSMITH_TRACING = os.getenv("LANGSMITH_TRACING", "false").lower() == "true"
+LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
+LLM_MODEL = os.getenv("LLM_MODEL")
+LLM_API_KEY = os.getenv("LLM_API_KEY")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
+LLM_API_BASE = os.getenv("LLM_API_BASE")
