@@ -5,15 +5,19 @@ from django.dispatch import receiver
 
 from utils.vectordb import get_vector_store, vectors_collection
 
-from .models import BankTransaction, StoreTransaction
+from .models import BankTransaction, StoreItem, StoreTransaction
 
 logger = logging.getLogger(__name__)
 
 
+@receiver(post_save, sender=StoreItem)
 @receiver(post_save, sender=BankTransaction)
 @receiver(post_save, sender=StoreTransaction)
 def update_embeddings(sender, instance, created, *args, **kwargs):
     try:
+        if sender == StoreItem:
+            instance = instance.transaction
+
         vector_document = instance.to_vector_document()
         vector_store = get_vector_store()
 
