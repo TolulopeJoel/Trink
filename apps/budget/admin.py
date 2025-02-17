@@ -5,8 +5,8 @@ from .models import Budget, SavingsGoal
 
 @admin.register(Budget)
 class BudgetAdmin(admin.ModelAdmin):
-    list_display = ('user', 'category', 'month', 'planned_amount', 'actual_amount', 'status')
-    list_filter = ('month', 'category', 'status')
+    list_display = ('user', 'subcategory', 'month', 'planned_amount', 'actual_amount', 'status')
+    list_filter = ('month', 'subcategory', 'status')
     search_fields = ('user__username', 'category__name')
     date_hierarchy = 'month'
     readonly_fields = ('updated_at',)

@@ -11,25 +11,29 @@ def update_budget_actual_amount(transaction):
     """Update the actual amount for the budget based on transactions"""
     # Get the first day of the transaction's month
     transaction_month = transaction.transaction_date.replace(day=1)
-
     # Find the corresponding budget
-    budget = Budget.objects.get(
+
+    budget, _ = Budget.objects.get_or_create(
         user=transaction.user,
-        category=transaction.subcategories.first().category,  # Get the first subcategory
-        month=transaction_month
+        subcategory=transaction.subcategories.first(),  # Get the first subcategory
+        month=transaction_month,
+        defaults={
+            'planned_amount' : 0
+        }
     )
+
+    budget.cate
 
     # Calculate total transactions for this category in this month
     bank_total = BankTransaction.objects.filter(
         user=transaction.user,
-        subcategories__category=budget.category,
+        subcategories__category=budget.subcategory.category,
         transaction_date__year=transaction.transaction_date.year,
         transaction_date__month=transaction.transaction_date.month
     ).aggregate(total=Sum('amount'))['total'] or 0
 
     store_total = StoreTransaction.objects.filter(
         user=transaction.user,
-        subcategories__category=budget.category,
         transaction_date__year=transaction.transaction_date.year,
         transaction_date__month=transaction.transaction_date.month
     ).aggregate(total=Sum('amount'))['total'] or 0

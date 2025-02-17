@@ -27,7 +27,7 @@ class BudgetViewSet(viewsets.ModelViewSet):
 
         return Budget.objects \
             .filter(user=self.request.user, month=month_date) \
-            .select_related('category')
+            .select_related('subcategory')
 
     @action(detail=False, methods=['get'])
     def summary(self, request):

@@ -22,6 +22,14 @@ class Category(TimestampedModel):
     def __str__(self):
         return self.name
 
+    def get_total_budget(self, user, month):
+        """
+        Get the total budget across all subcategories for this category
+        Returns a dictionary with total_budget and total_rollover
+        """
+        from apps.budget.models import Budget
+        return Budget.get_category_total_budget(self, user, month)
+
 
 class SubCategory(TimestampedModel):
     """
