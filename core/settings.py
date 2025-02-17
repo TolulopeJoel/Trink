@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
     # local apps
     "apps.budget.apps.BudgetConfig",
+    "apps.insights.apps.InsightsConfig",
     "apps.accounts.apps.AccountsConfig",
     "apps.categories.apps.CategoriesConfig",
     "apps.transactions.apps.TransactionsConfig",

@@ -23,6 +23,12 @@ class Insight(TimestampedModel):
         on_delete=models.SET_NULL
     )
 
+    SEVERITY_CHOICES = (
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+    )
+
     INSIGHT_CHOICES = [
         ("habit_detection", "Habit Detection"),
         ("behavioral_insights", "Behavioral Insights"),
@@ -31,6 +37,12 @@ class Insight(TimestampedModel):
         ("spending_patterns_and_trends", "Spending Patterns & Trends"),
     ]
 
-    type = models.CharField(max_length=100, choices=INSIGHT_CHOICES)
     title = models.CharField(max_length=100)
-    body = models.TextField()
+    description = models.TextField()
+    action = models.TextField()
+
+    severity = models.CharField(max_length=100, default="low")
+    type = models.CharField(max_length=100, choices=INSIGHT_CHOICES)
+
+    def __str__(self):
+        return f"{self.title} - {self.user.username}"
